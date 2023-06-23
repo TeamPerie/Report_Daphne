@@ -1,0 +1,7 @@
+./data/sra/SRR11539031/SRR11539031.sra
+./data/reference/refdata-cellranger-arc-GRCh38-2020-A-2.0.0/fasta/genome.fa.sa
+./data/reference/refdata-cellranger-arc-GRCh38-2020-A-2.0.0/fasta/genome.fa.bwt
+./data/reference/refdata-cellranger-arc-GRCh38-2020-A-2.0.0/fasta/genome.fa
+./data/reference/refdata-cellranger-arc-GRCh38-2020-A-2.0.0/star/SAindex
+./data/reference/refdata-cellranger-arc-GRCh38-2020-A-2.0.0/star/SA
+./data/reference/refdata-cellranger-arc-GRCh38-2020-A-2.0.0/star/Genome
