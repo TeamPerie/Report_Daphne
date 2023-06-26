@@ -1,11 +1,11 @@
  #!/bin/bash
-conda activate signac
+#conda activate signac
 
 samples='SRR11539031 SRR11539032 SRR11539033 SRR11539034'
 for sample in $samples
 do
-	mkdir -p ../output/signac-analysis/${sample}
-	cd ../output/signac-analysis/${sample}
+	mkdir -p ${1}/Reproduce_Thesis_InstitutCurie/output/signac_analysis/${sample}
+	cd ${1}/Reproduce_Thesis_InstitutCurie/output/signac_analysis/${sample}
 	
 	if [ ${sample} == "SRR11539031" ] || [ ${sample} == "SRR11539032" ] 
 	then
@@ -14,15 +14,8 @@ do
 		MinReads=60
 	fi
 	
-	Rscript ../../../code/Rscripts/QC.R $sample 1000 $MinReads 20
+	Rscript "${1}/Reproduce_Thesis_InstitutCurie/code/Rscripts/QC.R" $sample 1000 $MinReads 20
 done
-
-
-
-
-# MinPeaks=1000 #log10 >= 3
-# MinReads=25 for BM and 60 for PBMC
-# Depth=20
 
 
 

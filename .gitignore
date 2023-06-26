@@ -124,3 +124,5 @@
 ./output/mgatk_out/SRR11539031/final/lib_id.depthTable.txt
 ./output/mgatk_out/SRR11539031/final/chrM_refAllele.txt
 ./output/mgatk_out/SRR11539031/logs/lib_id.snakemake_tenx.log
+./log/*.err
+./log*.log
