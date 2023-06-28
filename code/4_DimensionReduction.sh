@@ -1,6 +1,5 @@
  #!/bin/bash
 
-
 samples='SRR11539031 SRR11539032 SRR11539033 SRR11539034'
 for sample in $samples
 do
@@ -16,4 +15,3 @@ do
 	
 	Rscript "${1}/Reproduce_Thesis_InstitutCurie/code/Rscripts/DimensionReduction.R" $tissue
 done
-
