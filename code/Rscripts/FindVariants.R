@@ -35,6 +35,6 @@ write_rds(SO1, paste0("SO_", args[2],"1_variants.rds"))
 
 SO2 <- AlleleFreq(SO2, variants = high.conf$variant, assay = "mito")
 DefaultAssay(SO2) <- "alleles"
-write_rds(SO1, paste0("SO_", args[2],"2_variants.rds"))
+write_rds(SO2, paste0("SO_", args[2],"2_variants.rds"))
 
 
