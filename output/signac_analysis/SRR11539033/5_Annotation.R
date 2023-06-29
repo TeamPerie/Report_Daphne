@@ -28,24 +28,3 @@ png("UMAP.png")
 p <- DimPlot(object = SO, label = TRUE) + NoLegend()
 print(p)
 dev.off()
-
-###lymphoid/myeloid
-SO <- read_rds("SO_Annotated.rds")
-SO <- RenameIdents(
-  object = SO,
-  'Memory-CD4-TCell' = 'Lymphoid',
-  'GammaDelta-TCell' = 'Lymphoid',
-  'CD14-Monocyte' = 'Myeloid',
-  'Activated-BCell' = 'Lymphoid',
-  'Naive-CD4-TCell' = 'Lymphoid',
-  'NK-Cell' = 'NK-Cell',
-  'Cytotoxic-CD8-TCell' = 'Lymphoid',
-  'CD16-Monocyte' = 'Myeloid',
-  'Memory-BCell' = 'Lymphoid',
-  'DC' = 'DC',
-  'Treg' = 'Lymphoid'
-)
-
-png("UMAP_Lineages.png")
-DimPlot(object = SO, label = TRUE, cols = c("#F8766D", "#00BFC4", "grey", "grey")) + NoLegend()
-dev.off()
