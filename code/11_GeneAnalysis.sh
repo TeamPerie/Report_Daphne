@@ -7,8 +7,9 @@ for lineage in $lineages
 do
 	mkdir -p ${1}/Reproduce_Thesis_InstitutCurie/output/signac_analysis/BM/${lineage}
 	cd ${1}/Reproduce_Thesis_InstitutCurie/output/signac_analysis/BM/${lineage}
-	for sample in $samples
-	do
-		Rscript "${1}/Reproduce_Thesis_InstitutCurie/code/Rscripts/DEG.R" ${lineage} ${sample}
-	done
+# 	for sample in $samples
+# 	do
+# 		Rscript "${1}/Reproduce_Thesis_InstitutCurie/code/Rscripts/DEG.R" ${lineage} ${sample}
+# 	done
+	Rscript "${1}/Reproduce_Thesis_InstitutCurie/code/Rscripts/Volcano.R" ${lineage}
 done

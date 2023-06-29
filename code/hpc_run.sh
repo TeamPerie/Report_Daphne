@@ -11,4 +11,6 @@
 conda activate signac
 
 cd "/data/users/mvanginn/CellLineageTracing/Reproduce_Thesis_InstitutCurie/code"
-bash /data/users/mvanginn/CellLineageTracing/Reproduce_Thesis_InstitutCurie/code/9_GeneAnalysis.sh "/data/users/mvanginn/CellLineageTracing"
+#bash /data/users/mvanginn/CellLineageTracing/Reproduce_Thesis_InstitutCurie/code/9_VAFplots.sh "/data/users/mvanginn/CellLineageTracing"
+
+bash /data/users/mvanginn/CellLineageTracing/Reproduce_Thesis_InstitutCurie/code/11_GeneAnalysis.sh "/data/users/mvanginn/CellLineageTracing"
