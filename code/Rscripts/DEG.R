@@ -17,15 +17,19 @@ annotate_SO <- function(df, SO){
     return(SO)   
 }
 
-create_umap <- function(SO, output_dir, Sample){
+create_umap <- function(SO, lineages, output_dir, Sample){
     df <- SO@reductions$umap@cell.embeddings
     df <- cbind.data.frame(df, "Bias" = SO@meta.data$Bias)
-    df <- df[df$Bias != "undefined",]
-    df %>% arrange(Bias) -> df
-    png(paste0(output_dir, "/UMAP_",Sample,"_Lineages.png"))
-    p <- ggplot(df, aes(x = -(as.numeric(UMAP_1)), y = as.numeric(UMAP_2), color = Bias)) +
+    df %>% arrange(desc(Bias)) -> df
+    svg(paste0(output_dir, "/UMAP_", Sample, "_Lineages.svg"))
+    p <- ggplot(df, aes(x = as.numeric(UMAP_1), y = as.numeric(UMAP_2), color = Bias)) +
     geom_point() +
-    labs(x = "UMAP_1", y = "UMAP_2", color = "Bias") + theme_classic()
+    labs(x = "UMAP_1", y = "UMAP_2", color = "Bias") + theme_classic() +
+    scale_color_manual(values = c("undefined" = "grey", 
+                                    "Lineage1" = ifelse(lineages[1] == "Lymphoid", "red", "green"),
+                                    "Lineage2" = ifelse(lineages[2] == "Myeloid", "blue", "black")),
+                       labels = c(lineages[1], lineages[2], "Undefined")) +
+      guides(color = guide_legend(override.aes = list(shape = 16)))
     print(p)
     dev.off()
 }
@@ -36,7 +40,7 @@ density_plot <-function(SO, lineages, output_dir, Sample){
     so2 <- subset(SO,idents = c("Lineage2"))
     p1 <- createDensityPlot(so1, bins = 50, lineages[1]) + NoLegend()
     p2 <- createDensityPlot(so2, bins = 50, lineages[2])
-    png(paste0(output_dir, "/", Sample, "_Density_UMAP.png"), width=480, height=960)
+    svg(paste0(output_dir, "/", Sample, "_Density_UMAP.svg"), width=480, height=960)
     print(ggarrange(p1, p2,ncol = 1, nrow = 2))
     dev.off()
 }
@@ -45,7 +49,7 @@ density_plot <-function(SO, lineages, output_dir, Sample){
 createDensityPlot <- function(sobj,bins = 10, lineage){
   
   tmp.all<-as.data.frame(Embeddings(object = sobj, reduction = "umap"))
-  p <- ggplot(tmp.all, aes(x = -(UMAP_1), y = UMAP_2)) + geom_point(colour="#00000000") + 
+  p <- ggplot(tmp.all, aes(x = UMAP_1, y = UMAP_2)) + geom_point(colour="#00000000") + 
     stat_density_2d(aes(fill = stat(level)), geom = "polygon", bins=bins) + 
     scale_fill_gradientn(colors = c("#4169E100","royalblue", "darkolivegreen3","goldenrod1","red")) +
     theme_classic() + 
@@ -108,7 +112,7 @@ print(table(df$bias))
 
 #step 3: UMAP
 SO <- annotate_SO(df, SO)
-create_umap(SO, output_dir, Sample)
+create_umap(SO, lineages = Lineages, output_dir, Sample)
 
 #step 4: Create density UMAPs
 #https://github.com/TeamPerie/Cosgrove-et-al-2022/blob/main/Figure1/INTEGRATION/IntegrateDataset_Analysis.html
