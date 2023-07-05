@@ -16,7 +16,10 @@ volcano_plot <- function(genes, output_dir, Sample, fc_threshold, p_threshold, l
                        labels = c(lineages[2], "Not significant", lineages[1]))  +
         geom_label(data = subset(genes, gene %in% label), 
           aes(x=avg_log2FC, y=-log10(p_val), label=gene), show_guide  = FALSE) +
-        theme_classic()
+        theme_classic() +
+  	theme(text = element_text(size = 14),
+    		axis.title = element_text(size = 14),
+    		axis.text = element_text(size = 14))
     print(p)
     dev.off()
 }

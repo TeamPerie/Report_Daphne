@@ -7,13 +7,20 @@
 
 
 pathway_plot <- function(df, lineage, output_dir, Sample){
-    if(lineage == "Myeloid"){color = "blue"}else{color="red"}
+    if(lineage == "Myeloid"){color = "blue"}
+    if(lineage == "Lymphoid"){color = "red"}
+    if(lineage == "HSC"){color = "green"}
+    if(lineage == "Other"){color = "black"}
     df %>% separate(Term, into = c("hsa", "Term"), sep = ":", remove = TRUE) -> df
     df$Term <- factor(df$Term, levels=df$Term[order(df$PValue)])
-    png(paste0(output_dir, "/",Sample,"_Pathway_",lineage,".png"))
+    svg(paste0(output_dir, "/",Sample,"_Pathway_",lineage,".svg"))
     p<-ggplot(data=df, aes(x=Term, y=-log10(PValue))) +
       geom_bar(stat="identity", fill = color) + coord_flip() + 
-      labs(title = lineage) + theme_classic() 
+      labs(title = lineage) + theme_classic() +
+      theme(text = element_text(size = 14),
+    		axis.title = element_text(size = 14),
+    		axis.text = element_text(size = 14))
+
     print(p)
     dev.off()
 }
