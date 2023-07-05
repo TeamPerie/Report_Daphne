@@ -38,16 +38,13 @@ density_plot <-function(SO, lineages, output_dir, Sample){
     Idents(SO) <- "Bias"
     so1 <- subset(SO,idents = c("Lineage1"))
     so2 <- subset(SO,idents = c("Lineage2"))
-    p1 <- createDensityPlot(so1, bins = 50, lineages[1]) + NoLegend()
-    p2 <- createDensityPlot(so2, bins = 50, lineages[2])
-    svg(paste0(output_dir, "/", Sample, "_Density_UMAP.svg"), width=480, height=960)
-    print(ggarrange(p1, p2,ncol = 1, nrow = 2))
-    dev.off()
+    createDensityPlot(so1, bins = 50, lineages[1], Sample)
+    createDensityPlot(so2, bins = 50, lineages[2], Sample)
 }
 
 #From https://github.com/TeamPerie/Cosgrove-et-al-2022/blob/main/Figure1/INTEGRATION/helper_methods_refactored.R
-createDensityPlot <- function(sobj,bins = 10, lineage){
-  
+createDensityPlot <- function(sobj,bins = 10, lineage, Sample){
+  svg(paste0(output_dir, "/", lineage, "_", Sample, "_Density_UMAP.svg"))
   tmp.all<-as.data.frame(Embeddings(object = sobj, reduction = "umap"))
   p <- ggplot(tmp.all, aes(x = UMAP_1, y = UMAP_2)) + geom_point(colour="#00000000") + 
     stat_density_2d(aes(fill = stat(level)), geom = "polygon", bins=bins) + 
@@ -56,7 +53,8 @@ createDensityPlot <- function(sobj,bins = 10, lineage){
     theme(legend.position="bottom") +
     ggtitle(lineage) + xlim(c(-10,10)) + ylim(c(-8,8))
   
-  return(p)
+  print(p)
+  dev.off()
 }
 
 deg_between_lineages <- function(SO, output_dir, Sample){
@@ -112,20 +110,20 @@ print(table(df$bias))
 
 #step 3: UMAP
 SO <- annotate_SO(df, SO)
-create_umap(SO, lineages = Lineages, output_dir, Sample)
+#create_umap(SO, lineages = Lineages, output_dir, Sample)
 
 #step 4: Create density UMAPs
 #https://github.com/TeamPerie/Cosgrove-et-al-2022/blob/main/Figure1/INTEGRATION/IntegrateDataset_Analysis.html
 density_plot(SO, lineages = Lineages, output_dir, Sample)
 
 #step 5:DEG between myeloid/lymphoid
-genes <- deg_between_lineages(SO, output_dir, Sample=Sample)
-fc_threshold = 0.1
-p_threshold = 0.05
-
-markers_up = genes[genes$avg_log2FC > fc_threshold & genes$p_val < p_threshold, ]
-write(markers_up %>% rownames, paste0(output_dir,"/",Sample,"_up_gene.txt"))
-markers_down = genes[genes$avg_log2FC < -(fc_threshold) & genes$p_val < p_threshold, ]
-write(markers_down%>% rownames, paste0(output_dir,"/",Sample, "_down_gene.txt"))
+# genes <- deg_between_lineages(SO, output_dir, Sample=Sample)
+# fc_threshold = 0.1
+# p_threshold = 0.05
+# 
+# markers_up = genes[genes$avg_log2FC > fc_threshold & genes$p_val < p_threshold, ]
+# write(markers_up %>% rownames, paste0(output_dir,"/",Sample,"_up_gene.txt"))
+# markers_down = genes[genes$avg_log2FC < -(fc_threshold) & genes$p_val < p_threshold, ]
+# write(markers_down%>% rownames, paste0(output_dir,"/",Sample, "_down_gene.txt"))
 
 
