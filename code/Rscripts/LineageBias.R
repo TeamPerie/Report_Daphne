@@ -9,15 +9,35 @@ chisquare <- function(
     df,
     lineages,
     output_dir,
+    Sample,
     remove_other = FALSE
 ){
   df <- annotate_lineages(df, lineages, remove_other)
+  create_umap(df, output_dir, Sample, lineages)
   clones <- stacked_barplot(df, output_dir, lineages=lineages)
   df2 <- df[df$mutation %in% clones,]
   stats <- chisquare_stats(df2, output_dir, lineages)
   ranked_clones(stats, output_dir, lineages)
   df_sign <- stats %>% subset(pvalue < 0.05)
   heatmap_lineages(df_sign, output_dir, lineages)
+}
+
+create_umap <- function(df, output_dir, Sample, lineages){
+  for (repl in paste0(Sample, c(1,2))){
+    SO <- readRDS(paste0("SO_",repl,"_variants.rds"))
+    SO_UMAP <- as.data.frame(SO@reductions$umap@cell.embeddings)
+    SO_UMAP %>% mutate(cell = rownames(SO_UMAP)) -> SO_UMAP
+    df2 <- inner_join(SO_UMAP, df[,c("cell","annotation")], by = "cell") 
+    if (lineages[1]=="HSC"){colors <- c("HSC"="green","Other"="black")}else{
+      colors <- c("Lymphoid" = "red", "Myeloid" = "blue", "NK-Cell" = "grey", "DC" = "grey")}
+    svg(paste0(output_dir,"/", repl, "_UMAP_lineages.svg"))
+    p <- ggplot(df2, aes(x = UMAP_1, y = UMAP_2, color = annotation)) +
+      geom_point() +
+      scale_color_manual(values = colors) +
+      theme_classic() + theme(legend.position = "none")
+    print(p)
+    dev.off()
+  }
 }
 
 
@@ -62,15 +82,20 @@ stacked_barplot <- function(
   df2$mutation <- factor(df2$mutation, levels = unique(df2$mutation))
   df2$all <- "all"
   
-  png(paste0(output_dir, "/Stacked_barplot_clones.png"), width = 800, height=480)
+  svg(paste0(output_dir, "/Stacked_barplot_clones.svg"))
   p1 <- ggplot(df2, aes(x=mutation, fill=annotation, y=proportion)) + 
     geom_bar(width=1, position = "fill", stat = "identity") + theme_classic() +
-    theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(),
-                axis.text.y = element_blank(), axis.ticks.y = element_blank()) +
+    scale_fill_manual(values = c("HSC" = "green", "Lymphoid" = "red","Other"= "black", "Myeloid" = "blue")) +
+    theme(text = element_text(size = 14), axis.title = element_text(size = 14), axis.text = element_text(size = 14),
+	axis.text.x = element_blank(), axis.ticks.x = element_blank(), axis.text.y = element_blank(), 
+	axis.ticks.y = element_blank()) + 
     labs(x = paste0("Clones (n=", length(unique(df2$mutation)), ")"), y = element_blank())
   p2 <- ggplot(df2, aes(x=all, fill=annotation, y=proportion)) + 
+    scale_fill_manual(values = c("HSC" = "green", "Lymphoid" = "red","Other"= "black", "Myeloid" = "blue")) +
     geom_bar(width=1, position = "fill", stat = "identity") + theme_classic() +
-    theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(), legend.position = "none")
+    theme(text = element_text(size = 14), axis.title = element_text(size = 14),
+	axis.text = element_text(size = 14), axis.text.x = element_blank(), axis.ticks.x = element_blank(), 
+	legend.position = "none")
   print(grid.arrange(p2, p1, ncol = 2, widths = c(1,3)))
   dev.off()
   
@@ -168,11 +193,16 @@ ranked_clones <- function(df, output_dir, lineages){
   png(paste0(output_dir, "/RankedClones.png"))
   p <- ggplot(stats, aes(x=as.numeric(rank), y=-log10(pvalue), colour = as.factor(Bias))) +
     geom_point() +
-    scale_color_manual("Biased clones", values = c("#F8766D", "#00BFC4", "black")) +
+    scale_color_manual("Biased clones", values = c(ifelse(lineages[1] == "Lymphoid", "red", "green"),
+	ifelse(lineages[2] == "Myeloid", "blue", "black"), "grey")) +
     geom_text(data = subset(stats, pvalue < 0.05), 
               aes(x=as.numeric(rank), y=-log10(pvalue), label=mutation),
               hjust = 0, nudge_x = 3) +
-    labs(x = "Rank sorted clones", y = "-log10 p-value") + theme_classic() 
+    labs(x = "Rank sorted clones", y = "-log10 p-value") + theme_classic() +
+    theme(text = element_text(size = 14),
+    		axis.title = element_text(size = 14),
+    		axis.text = element_text(size = 14))
+
   print(p)
   dev.off()
 }
@@ -230,5 +260,5 @@ lineages <- strsplit(args[1], "_")[[1]]
 df <- fread("table_cellular_mutation.tsv", sep = "\t", header = TRUE, data.table = FALSE)
 #df$annotation <- as.character(df$annotation)
 
-chisquare(df = df, lineages = lineages, remove_other = TRUE, output_dir = getwd())
+chisquare(df = df, lineages = lineages, remove_other = TRUE, output_dir = getwd(), Sample = args[2])
 
