@@ -28,8 +28,15 @@ SO <- RunUMAP(SO, reduction = "lsi", dims = 2:30)
 SO <- FindNeighbors(SO, reduction = "lsi", dims = 2:30, k.param = 15)
 SO <- FindClusters(SO, resolution = 0.85, algorithm = 1) #original Louvain algorithm
 
-png("Clustered_UMAP.png")
-p <- DimPlot(object = SO, label = TRUE) + NoLegend()
+SO_UMAP <- as.data.frame(SO@reductions$umap@cell.embeddings)
+SO_UMAP %>% mutate(cell = rownames(SO_UMAP)) -> SO_UMAP
+SO_META <- as.data.frame(SO@meta.data)
+SO_META %>% mutate(cell = rownames(SO_META)) -> SO_META
+df <- inner_join(SO_UMAP, SO_META[,c("cell","seurat_clusters")], by = "cell") 
+svg("Clustered_UMAP.svg")
+p <- ggplot(df, aes(x = UMAP_1, y = UMAP_2, color = seurat_clusters)) +
+      geom_point() +
+      theme_classic()
 print(p)
 dev.off()
 
@@ -76,14 +83,11 @@ SO <- AddMetaData(SO, metadata = celltype.predictions)
 write_rds(SO, "SO_LabelTransfer.rds")
 
 #Plot predicted cell types
-palette <- distinctColorPalette(length(unique(unique(SO@meta.data$predicted.id))))
-png("TransferCelltype.png", width = 900, height = 600)
-p <- DimPlot(
-  object = SO,
-  group.by = "predicted.id",
-  pt.size = 1.5,
-  cols = palette
-)
+df <- inner_join(SO_UMAP, SO_META[,c("cell","predicted.id")], by = "cell") 
+svg("TransferCelltype_UMAP.svg")
+p <- ggplot(df, aes(x = UMAP_1, y = UMAP_2, color = predicted.id)) +
+      geom_point() +
+      theme_classic()
 print(p)
 dev.off()
 
@@ -96,7 +100,7 @@ reshape2::dcast(long_df, seurat_clusters ~ predicted.id, value.var = "prop", fil
 long_df$predicted.id <- factor(as.character(long_df$predicted.id), rev(unique(as.character(long_df$predicted.id))))
 
 plot <- ggplot(long_df, aes(y = predicted.id, x = seurat_clusters, fill = prop)) + 
-  geom_tile() + pretty_plot(fontsize = 6) + L_border() +
+  geom_tile() + pretty_plot(fontsize = 8) + L_border() +
   scale_fill_gradientn(colors = jdb_palette("solar_rojos")) +
   scale_y_discrete(expand = c(0,0)) + scale_x_discrete(expand = c(0,0)) +
   theme(legend.position = "none") + labs(x = "ATAC Cluster", y = "scRNA transfer label")

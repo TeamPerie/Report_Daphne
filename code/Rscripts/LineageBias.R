@@ -190,7 +190,7 @@ ranked_clones <- function(df, output_dir, lineages){
   stats[stats$odds_ratio > 1 & stats$pvalue < 0.05,"Bias"] <- lineages[1]
   stats[stats$odds_ratio < 1 & stats$pvalue < 0.05,"Bias"] <- lineages[2]
   
-  png(paste0(output_dir, "/RankedClones.png"))
+  svg(paste0(output_dir, "/RankedClones.svg"))
   p <- ggplot(stats, aes(x=as.numeric(rank), y=-log10(pvalue), colour = as.factor(Bias))) +
     geom_point() +
     scale_color_manual("Biased clones", values = c(ifelse(lineages[1] == "Lymphoid", "red", "green"),
@@ -233,7 +233,7 @@ heatmap_lineages <- function(df, output_dir, lineages){
     long_df$mutation <- factor(x=long_df$mutation, levels = df$mutation[df_order], ordered=TRUE)
   }
   
-  png(paste0(output_dir, "/Heatmap_LineageBias.png"))
+  svg(paste0(output_dir, "/Heatmap_LineageBias.svg"))
   plot <- ggplot(long_df, aes(y = mutation, x = lineage, fill = as.numeric(proportion))) + 
     geom_tile() + pretty_plot(fontsize = 15) + L_border() +
     scale_fill_gradientn("Proportion mutant cells", colors = jdb_palette("solar_rojos")) +

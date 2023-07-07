@@ -17,8 +17,11 @@ write_rds(SO, "SO_merged.rds")
 mito.data <-  read_rds(paste0("../",samples[1],"/mito.data.rds")) #reference alleles are equal between replicates
 variable.sites <- IdentifyVariants(SO, assay = "mito", refallele = mito.data$refallele, low.coverage_threshold = 10)
 
-png("variantplot.png")
-p <- VariantPlot(variants = variable.sites, min.cells = 5, concordance.threshold = 0.5)
+svg("variantplot.svg")
+p <- VariantPlot(variants = variable.sites, min.cells = 5, concordance.threshold = 0.5) +
+	theme(text = element_text(size = 22),
+    		axis.title = element_text(size = 22),
+    		axis.text = element_text(size = 16))
 print(p)
 dev.off()
 
