@@ -22,8 +22,15 @@ SO <- RenameIdents(
 SO <- AddMetaData(SO, metadata = Idents(SO), col.name = "Cell.Types")
 write_rds(SO, "SO_Annotated.rds")
 
-
-png("UMAP.png")
-p <- DimPlot(object = SO, label = TRUE) + NoLegend()
+SO_UMAP <- as.data.frame(SO@reductions$umap@cell.embeddings)
+SO_UMAP %>% mutate(cell = rownames(SO_UMAP)) -> SO_UMAP
+SO_META <- as.data.frame(SO@meta.data)
+SO_META %>% mutate(cell = rownames(SO_META)) -> SO_META
+df <- inner_join(SO_UMAP, SO_META[,c("cell","Cell.Types")], by = "cell") 
+svg("Annotated_UMAP.svg")
+p <- ggplot(df, aes(x = UMAP_1, y = UMAP_2, color = Cell.Types)) +
+      geom_point() +
+      theme_classic()
 print(p)
 dev.off()
+

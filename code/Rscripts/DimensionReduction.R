@@ -18,8 +18,10 @@ SO <- FindTopFeatures(SO) #based on total count, no min.cutoff
 SO <- RunSVD(SO) #Use all features, scale cell embedding to mean 0 and SD 1
 
 #Check if first dimension is related to read depth
-png("depth_dimension_correlation.png")
-p <- DepthCor(SO)
+svg("depth_dimension_correlation.svg")
+p <- DepthCor(SO) + theme(text = element_text(size = 14),
+    		axis.title = element_text(size = 14),
+    		axis.text = element_text(size = 14))
 print(p)
 dev.off()
 
