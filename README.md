@@ -1,5 +1,5 @@
 # Reproduce_Thesis_InstitutCurie
-This repository includes all code to reproduce the results from my Master's thesis named "Identification of genetic mechanisms controlling lineage commitment during human hematopoiesis".
+This repository includes all code to reproduce the results from my Master's thesis named "Analyze lineage commitment during human hematopoiesis using somatic mitochondrial mutations".
 
 ### Input file
 The four scATAC-seq files can be downloaded using SRA toolkit from https://www.ncbi.nlm.nih.gov/sra?term=SRP256229.  
